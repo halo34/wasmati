@@ -16,7 +16,7 @@ using nlohmann::json;
         s_verbose_stream->Writef(                                             \
             "[WARNING] Assert failed '%s' in file %s at line %d in function " \
             "%s\n",                                                           \
-            __STRING(expr), __FILE__, __LINE__, __ASSERT_FUNCTION);           \
+            __STRING(expr), __FILE__, __LINE__, __func__);                    \
     }
 
 namespace wasmati {

@@ -1,9 +1,17 @@
-cmake_minimum_required(VERSION 3.14.0)
+cmake_minimum_required(VERSION 4.0.0)
 project(WASMATI VERSION 1.0.0)
+set(CMAKE_POLICY_VERSION_MINIMUM 3.5)
 find_package(OpenSSL REQUIRED)
 find_package(ZLIB REQUIRED)
 find_package(BISON REQUIRED)
 find_package(FLEX REQUIRED)
+
+# if (BISON_VERSION VERSION_LESS "3.0")
+#   message(FATAL_ERROR
+#     "Bison >= 3.0 is required (found ${BISON_VERSION}). "
+#     "Install a newer bison and reconfigure with "
+#     "-DBISON_EXECUTABLE=/path/to/new/bison.")
+# endif ()
 
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 set(CMAKE_PROJECT_VERSION "${CMAKE_PROJECT_VERSION}")
@@ -212,7 +220,9 @@ externalproject_add(libzip
   PREFIX ${CMAKE_CURRENT_BINARY_DIR}/libzip
   GIT_REPOSITORY "https://github.com/nih-at/libzip.git"
   GIT_TAG "66e496489bdae81bfda8b0088172871d8fda0032"
-  CMAKE_ARGS -DCMAKE_INSTALL_PREFIX=${CMAKE_CURRENT_BINARY_DIR}/libzip
+  CMAKE_ARGS
+    -DCMAKE_INSTALL_PREFIX=${CMAKE_CURRENT_BINARY_DIR}/libzip
+    -DCMAKE_POLICY_VERSION_MINIMUM=3.5
 )
 
 ExternalProject_Get_Property(libzip install_dir)
@@ -237,11 +247,14 @@ ADD_FLEX_BISON_DEPENDENCY(DSLScanner DSLParser)
 
 add_library(interp STATIC
      ${FLEX_DSLScanner_OUTPUTS}
-     ${BISON_DSLParser_OUTPUTS}  
-     ${FLEX_LIBRARIES})
+     ${BISON_DSLParser_OUTPUTS})
+
+if (FLEX_LIBRARIES)
+  target_link_libraries(interp PRIVATE ${FLEX_LIBRARIES})
+endif ()
 
 add_library(wasmatilib STATIC
-	  src/config/config.h
+	  ${WASMATI_BINARY_DIR}/config.h
 	  src/config/config.cc
 	  src/options.h
 	  src/options.cc
@@ -317,6 +330,10 @@ if (NOT EMSCRIPTEN)
     endif ()
 
     add_executable(${EXE_NAME} ${EXE_SOURCES})
+    set_target_properties(${EXE_NAME} PROPERTIES
+  BUILD_RPATH "${CMAKE_CURRENT_BINARY_DIR}/libzip/lib"
+  INSTALL_RPATH "@loader_path/../lib;@loader_path/../build/libzip/lib"
+)
     add_dependencies(everything_wasm ${EXE_NAME})
     add_dependencies(${EXE_NAME} libzip)
     target_link_libraries(${EXE_NAME} PRIVATE ${EXE_LIBS} wabt nlohmann_json::nlohmann_json interp zip)

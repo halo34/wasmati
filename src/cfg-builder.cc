@@ -17,8 +17,9 @@ void CFG::generateCFG() {
             cpgOptions.funcName.compare(f->name) != 0) {
             continue;
         }
-        assert(f->decl.has_func_type);
-        if (funcsInTable.count(f) == 1) {
+        // Some functions use inline signatures instead of `(type $t)`.
+        // In that case `has_func_type` is false, so we can't key by a type var.
+        if (f->decl.has_func_type && funcsInTable.count(f) == 1) {
             funcByType[f->decl.type_var.name()].insert(ast.funcs[f]);
         }
     }
