@@ -1,5 +1,4 @@
 int unreach() {
-    int y;
+    __builtin_trap();
     return 0;
-    y = 1 + 2;
 }

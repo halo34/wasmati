@@ -9,6 +9,8 @@ void VulnerabilityChecker::UnreachableCode() {
               numFuncs, func->name().c_str());
 
         auto pred = Predicate()
+                        .instType(InstType::Unreachable)
+                        .Or()
                         .instType(InstType::Return, false)
                         .instType(InstType::Block, false)
                         .instType(InstType::Loop, false)
