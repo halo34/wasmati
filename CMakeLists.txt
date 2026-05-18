@@ -291,9 +291,9 @@ add_library(wasmatilib STATIC
 	  #src/queries/taintedCallIndirect.cc
 	  src/queries/taintedFuncToFunc.cc
 	  src/queries/taintedLocalToFunc.cc
-	  #src/queries/unreachable.cc
-	  #src/queries/useAfterFree.cc
-	  #src/queries/doubleFree.cc
+	  src/queries/unreachable.cc
+	  src/queries/useAfterFree.cc
+	  src/queries/doubleFree.cc
 	  # interpreter
 	  src/interpreter/scanner.h
 	  src/interpreter/interpreter.h 

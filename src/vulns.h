@@ -89,7 +89,7 @@ static const json defaultConfig = R"(
 		}
 	},
 	"boMemcpy": [ "$strcpy", "$__stpcpy", "$memcpy" ],
-	"dangerousFunctions": [ "$gets", "$strcat" ],
+	"dangerousFunctions": [ "$gets", "$strcat", "$execve", "$system" ],
 	"formatString": {
 		"$fprintf": 1,
 		"$printf": 0,
