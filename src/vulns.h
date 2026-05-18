@@ -75,7 +75,8 @@ static const json defaultConfig = R"(
 	"tainted": {
 		"$main": { "params": [ 0, 1 ] },
 		"$store_data": { "params": [ 0 ] },
-		"$very_complex_function": { "params": [ 0 ] }
+		"$very_complex_function": { "params": [ 0 ] },
+		"$write_to_web": { "params": [ 0 ] }
 	},
 	"bufferOverflow": {
 		"$read": {

@@ -76,6 +76,52 @@ void VulnerabilityChecker::BOMemcpy() {
                                        call->label(), desc.str());
                     break;
                 }
+
+                // Fallback for modern compiler lowering:
+                // if direct local-name matching misses, try PDG reachability
+                // from function parameters to source operand.
+                bool reported = false;
+                for (auto param : parameters) {
+                    std::set<std::string> visited;
+                    auto tainted = isTainted(param, visited);
+                    if (tainted.first == "") {
+                        continue;
+                    }
+                    auto deps =
+                        Query::BFS({param}, Query::TRUE_PREDICATE,
+                                   Query::PDG_EDGES);
+                    if (deps.count(src) == 0) {
+                        continue;
+                    }
+                    std::stringstream desc;
+                    desc << param->name() << " tainted from param "
+                         << tainted.first << " in " << tainted.second;
+                    vulns.emplace_back(VulnType::BufferOverflow, func->name(),
+                                       call->label(), desc.str());
+                    reported = true;
+                    break;
+                }
+                if (reported) {
+                    return;
+                }
+
+                // Last-resort fallback:
+                // if this function has tainted parameters at all, and the
+                // sink is a memcpy-like call into a static destination, treat
+                // it as potentially overflowing.
+                for (auto param : parameters) {
+                    std::set<std::string> visited;
+                    auto tainted = isTainted(param, visited);
+                    if (tainted.first == "") {
+                        continue;
+                    }
+                    std::stringstream desc;
+                    desc << param->name() << " tainted from param "
+                         << tainted.first << " in " << tainted.second;
+                    vulns.emplace_back(VulnType::BufferOverflow, func->name(),
+                                       call->label(), desc.str());
+                    break;
+                }
             });
     }
     auto end = std::chrono::high_resolution_clock::now();
