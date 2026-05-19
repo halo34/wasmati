@@ -12,9 +12,7 @@ CFLAGS=-O0 \
   -mno-bulk-memory \
   -mno-sign-ext \
   -mno-nontrapping-fptoint
-  # -sEXPORTED_FUNCTIONS='["_write_to_web"]'
 
-# Export only the test entrypoints we care about for each file.
 EXPORT_FLAGS_insecureArgs=-Wl,--export=callInsecureArgs
 EXPORT_FLAGS_mem_leak=-Wl,--export=foo
 EXPORT_FLAGS_poc=-Wl,--export=write_to_web
@@ -24,7 +22,6 @@ EXPORT_FLAGS_trunc=-Wl,--export=foo
 EXPORT_FLAGS_uaf=-Wl,--export=foo
 EXPORT_FLAGS_unreach=-Wl,--export=unreach
 
-# Per-test compile overrides.
 EXTRA_CFLAGS_uaf=-O1
 
 .PHONY: all clean
