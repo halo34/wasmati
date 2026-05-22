@@ -17,7 +17,9 @@ EXPORT_FLAGS_insecureArgs=-Wl,--export=callInsecureArgs
 EXPORT_FLAGS_mem_leak=-Wl,--export=foo
 EXPORT_FLAGS_poc=-Wl,--export=write_to_web
 EXPORT_FLAGS_printf=-Wl,--export=logMessage -Wl,--export=logMessageVuln
+EXPORT_FLAGS_save_validation=-Wl,--export=safe_printf -Wl,--export=vuln_printf -Wl,--export=safe_fprintf -Wl,--export=vuln_fprintf
 EXPORT_FLAGS_sink=-Wl,--export=foo
+EXPORT_FLAGS_test=-Wl,--export=main
 EXPORT_FLAGS_trunc=-Wl,--export=foo
 EXPORT_FLAGS_uaf=-Wl,--export=foo
 EXPORT_FLAGS_unreach=-Wl,--export=unreach

@@ -7,6 +7,13 @@ void VulnerabilityChecker::FormatStrings() {
     json fsConfig = config.at(FORMAT_STRING);
     std::set<std::string> ignore = config[IGNORE];
 
+    auto altLabel = [](const std::string& label) {
+        if (!label.empty() && label[0] == '$') {
+            return label.substr(1);
+        }
+        return std::string("$") + label;
+    };
+
     Index counter = 0;
     for (auto func : Query::functions()) {
         debug("[DEBUG][Query::FormatString][%u/%u] Function %s\n", counter++,
@@ -19,8 +26,12 @@ void VulnerabilityChecker::FormatStrings() {
         auto callPredicate =
             Predicate()
                 .instType(InstType::Call)
-                .TEST(fsConfig.contains(node->label()))
-                .EXEC(child = node->getChild(fsConfig.at(node->label())))
+                .TEST(fsConfig.contains(node->label()) ||
+                      fsConfig.contains(altLabel(node->label())))
+                .EXEC(child = node->getChild(fsConfig.contains(node->label())
+                                                 ? fsConfig.at(node->label())
+                                                 : fsConfig.at(
+                                                       altLabel(node->label()))))
                 .PDG_EDGE(child, node, PDGType::Const, false);
 
         NodeStream(func).instructions(callPredicate).forEach([&](Node* call) {
