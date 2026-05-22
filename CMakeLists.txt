@@ -288,7 +288,7 @@ add_library(wasmatilib STATIC
 	  src/queries/dangerousFunctions.cc
 	  src/queries/formatStrings.cc
 	  src/queries/isTainted.cc
-	  #src/queries/taintedCallIndirect.cc
+	  src/queries/taintedCallIndirect.cc
 	  src/queries/taintedFuncToFunc.cc
 	  src/queries/taintedLocalToFunc.cc
 	  src/queries/unreachable.cc

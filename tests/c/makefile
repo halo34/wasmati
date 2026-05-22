@@ -23,7 +23,7 @@ EXPORT_FLAGS_test=-Wl,--export=main
 EXPORT_FLAGS_trunc=-Wl,--export=foo
 EXPORT_FLAGS_uaf=-Wl,--export=foo
 EXPORT_FLAGS_unreach=-Wl,--export=unreach
-
+EXPORT_FLAGS_dangorousFunction=-Wl,--export=main
 EXTRA_CFLAGS_uaf=-O1
 
 .PHONY: all clean

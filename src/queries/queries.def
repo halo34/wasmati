@@ -8,7 +8,7 @@ WASMATI_QUERY(BoScanfLoops, "Buffer Overflow - Scanf Loops", "Queries for buffer
 WASMATI_QUERY(BOMemcpy, "Buffer Overflow - Memcpy", "Queries for buffer overflows from copying memory from tainted buffer to static buffer.")
 WASMATI_QUERY(DangerousFunctions, "Buffer Overflow - Scanf Loops", "Queries for the use of dangerous functions.")
 WASMATI_QUERY(FormatStrings, "Format Strings", "Queries for format strings vulnerabilities.")
-// WASMATI_QUERY(TaintedCallIndirect, "Tainted - CallIndirect", "Queries for tainted argument in call_indirect.")
+WASMATI_QUERY(TaintedCallIndirect, "Tainted - CallIndirect", "Queries for tainted argument in call_indirect.")
 WASMATI_QUERY(TaintedFuncToFunc, "Tainted - Source/Sink", "Queries for source (function) to sink (function) vulnerabilities.")
 WASMATI_QUERY(TaintedLocalToFunc, "Tainted - Source/Sink", "Queries for source (local variable) to sink (function) vulnerabilities.")
 WASMATI_QUERY(UseAfterFree, "Use After Free", "Queries for use after free vulnerabilities.")
