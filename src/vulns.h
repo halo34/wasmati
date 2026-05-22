@@ -71,7 +71,8 @@ static const json defaultConfig = R"(
 		"$fflush"
 	],
 	"sources": [ "$read_bytes_to_mmap_memory" ],
-	"sinks": [],
+	"sinks": [    "$sqlite3_prepare_v2",
+    "$sqlite3_exec"],
 	"tainted": {
 		"$main": { "params": [ 0, 1 ] },
 		"$store_data": { "params": [ 0 ] },

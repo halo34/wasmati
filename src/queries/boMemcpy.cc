@@ -7,7 +7,17 @@ void VulnerabilityChecker::BOMemcpy() {
     std::set<std::string> memcpyFuncs = config.at(BO_MEMCPY);
     std::set<std::string> ignore = config[IGNORE];
 
+    std::set<std::string> sinks = config[SINKS];
     for (auto func : Query::functions()) {
+        auto sinkCode =
+            NodeStream(func)
+                .instructions(Predicate()
+                                  .instType(InstType::Call)
+                                  .TEST(sinks.count(node->label()) == 1))
+                .findFirst();
+       
+                
+
         if (ignore.count(func->name()) == 1) {
             continue;
         }
@@ -70,10 +80,18 @@ void VulnerabilityChecker::BOMemcpy() {
                         continue;
                     }
                     std::stringstream desc;
-                    desc << localVar->name() << " tainted from param "
+                    desc << localVar->name() << " tainted from param"
                          << tainted.first << " in " << tainted.second;
+
+                    if (sinkCode.isPresent()){
+                        desc << " SINK EXIST" << sinkCode.get()->label();
+                    } else{
+                        desc << " NO sink";
+                    }
+
                     vulns.emplace_back(VulnType::BufferOverflow, func->name(),
                                        call->label(), desc.str());
+                                       
                     break;
                 }
 
@@ -94,11 +112,20 @@ void VulnerabilityChecker::BOMemcpy() {
                         continue;
                     }
                     std::stringstream desc;
-                    desc << param->name() << " tainted from param "
+                    desc << param->name() << " tainted from param"
                          << tainted.first << " in " << tainted.second;
+
+                    if (sinkCode.isPresent()) {
+                        desc << " SINK EXIST " << sinkCode.get()->label();
+                    } else {
+                        desc << " NO sink";
+                    }
+
                     vulns.emplace_back(VulnType::BufferOverflow, func->name(),
                                        call->label(), desc.str());
                     reported = true;
+
+                   
                     break;
                 }
                 if (reported) {
@@ -109,6 +136,8 @@ void VulnerabilityChecker::BOMemcpy() {
                 // if this function has tainted parameters at all, and the
                 // sink is a memcpy-like call into a static destination, treat
                 // it as potentially overflowing.
+
+                // THIS IS THE ONE THAT THE code returns
                 for (auto param : parameters) {
                     std::set<std::string> visited;
                     auto tainted = isTainted(param, visited);
@@ -116,8 +145,16 @@ void VulnerabilityChecker::BOMemcpy() {
                         continue;
                     }
                     std::stringstream desc;
-                    desc << param->name() << " tainted from param "
+                    desc << param->name() << " tainted from param"
                          << tainted.first << " in " << tainted.second;
+                    
+
+                    if (sinkCode.isPresent()) {
+                        desc << " SINK EXIST " << sinkCode.get()->label();
+                    } else {
+                        desc << " NO sink";
+                    }
+
                     vulns.emplace_back(VulnType::BufferOverflow, func->name(),
                                        call->label(), desc.str());
                     break;
