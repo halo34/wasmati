@@ -270,6 +270,8 @@ add_library(wasmatilib STATIC
 	  src/query.cc
 	  src/utils.h
 	  src/vulns.h
+    src/sql-sink-find.h
+    src/sql-sink-find.cc
 	  # writters
 	  src/writers/csv-writer.h
 	  src/writers/datalog-writer.h

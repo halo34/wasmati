@@ -1,5 +1,6 @@
 #include "src/query.h"
 #include "src/vulns.h"
+#include "src/sql-sink-find.h"
 using namespace wasmati;
 
 void VulnerabilityChecker::BOMemcpy() {
@@ -9,12 +10,7 @@ void VulnerabilityChecker::BOMemcpy() {
 
     std::set<std::string> sinks = config[SINKS];
     for (auto func : Query::functions()) {
-        auto sinkCode =
-            NodeStream(func)
-                .instructions(Predicate()
-                                  .instType(InstType::Call)
-                                  .TEST(sinks.count(node->label()) == 1))
-                .findFirst();
+  
        
                 
 
@@ -83,12 +79,7 @@ void VulnerabilityChecker::BOMemcpy() {
                     desc << localVar->name() << " tainted from param"
                          << tainted.first << " in " << tainted.second;
 
-                    if (sinkCode.isPresent()){
-                        desc << " SINK EXIST" << sinkCode.get()->label();
-                    } else{
-                        desc << " NO sink";
-                    }
-
+                    desc << SQLSinkFind(func);
                     vulns.emplace_back(VulnType::BufferOverflow, func->name(),
                                        call->label(), desc.str());
                                        
@@ -115,11 +106,7 @@ void VulnerabilityChecker::BOMemcpy() {
                     desc << param->name() << " tainted from param"
                          << tainted.first << " in " << tainted.second;
 
-                    if (sinkCode.isPresent()) {
-                        desc << " SINK EXIST " << sinkCode.get()->label();
-                    } else {
-                        desc << " NO sink";
-                    }
+                    desc << SQLSinkFind(func);
 
                     vulns.emplace_back(VulnType::BufferOverflow, func->name(),
                                        call->label(), desc.str());
@@ -147,13 +134,8 @@ void VulnerabilityChecker::BOMemcpy() {
                     std::stringstream desc;
                     desc << param->name() << " tainted from param"
                          << tainted.first << " in " << tainted.second;
-                    
 
-                    if (sinkCode.isPresent()) {
-                        desc << " SINK EXIST " << sinkCode.get()->label();
-                    } else {
-                        desc << " NO sink";
-                    }
+                    desc << SQLSinkFind(func);
 
                     vulns.emplace_back(VulnType::BufferOverflow, func->name(),
                                        call->label(), desc.str());
