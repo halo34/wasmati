@@ -97,7 +97,51 @@ So, for example, if you want to build the debug configuration on Visual Studio 2
 > cmake .. -DCMAKE_BUILD_TYPE=DEBUG -DCMAKE_INSTALL_PREFIX=..\ -G "Visual Studio 14 2015"
 > cmake --build . --config DEBUG --target install
 ```
+## Commands
+```console
+> ./bin/wasmati --help
+usage: wasmati [options] filename
 
+  Read a file in the WebAssembly binary format or text format, and produces its
+  Code Property Graph to perform queries and find vulnerabilities in the code.
+
+
+options:
+      --help                                  Print this help message
+      --version                               Print version information
+  -v, --verbose                               Output information about the generation of Code Property Graph
+  -o, --output=FILENAME                       Output file for vulnerability report, by default use stdout
+  -d, --dot-output=FILENAME                   Serialize the graph as dot.
+  -D, --datalog=DIRECTORY                     Serialize the graph as a souffl� datalog program, facts are csv files (node.facts and edge.facts files).
+  -s, --csv-output=FILENAME                   Serialize the graph as csv file.
+  -j, --json-output=FILENAME                  Serialize the graph as JSON file.
+  -c, --config=FILENAME                       JSON configuration file.
+      --graph                                 Treat input file as a serialised graph.
+      --wat                                   Treat input file as a wat file.
+      --wasm                                  Treat input file as a wasm file.
+  -f, --function=FUNCTIONNAME                 Output file for the given function.
+  -i, --info                                  Print time information of the generation of CPG.
+  -l, --loop=LOOPNAME                         Print all information during generation of CPG.
+      --enable-exceptions                     Enable Experimental exception handling
+      --disable-mutable-globals               Disable Import/export mutable globals
+      --enable-saturating-float-to-int        Enable Saturating float-to-int operators
+      --enable-sign-extension                 Enable Sign-extension operators
+      --enable-simd                           Enable SIMD support
+      --enable-threads                        Enable Threading support
+      --enable-multi-value                    Enable Multi-value
+      --enable-tail-call                      Enable Tail-call support
+      --enable-bulk-memory                    Enable Bulk-memory operations
+      --enable-reference-types                Enable Reference types (anyref)
+      --enable-annotations                    Enable Custom annotation syntax
+      --enable-all                            Enable all features
+      --ignore-custom-section-errors          Ignore errors in custom sections
+      --no-check                              Don't check for invalid modules
+      --native                                Execute native queries.
+      --ast                                   Output the Abstract Syntax Tree
+      --cfg                                   Output the Control Flow Graph
+      --pdg                                   Output the Program Dependence Graph
+      --cg                                    Output the Call Graph
+```
 # Building using Docker
 Wasmati can be build and run in a docker compiler. For this you will need to have [Docker](https://www.docker.com/) installed.
 
@@ -113,3 +157,4 @@ You can also mount shared folders with the host by using the option `-v` and use
 ```console
 $ docker run -v <host_directory>:/work -t wasmati /work/example.wasm -d /work/example.csv
 ```
+
