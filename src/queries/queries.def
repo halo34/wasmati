@@ -13,7 +13,7 @@ WASMATI_QUERY(TaintedFuncToFunc, "Tainted - Source/Sink", "Queries for source (f
 WASMATI_QUERY(TaintedLocalToFunc, "Tainted - Source/Sink", "Queries for source (local variable) to sink (function) vulnerabilities.")
 WASMATI_QUERY(UseAfterFree, "Use After Free", "Queries for use after free vulnerabilities.")
 WASMATI_QUERY(DoubleFree, "Double Free", "Queries for double free vulnerabilities.")
-WASMATI_QUERY(IntegerOverflow, "Integer Overflow", "Queries for integer overflow vulnerabilities.")
+WASMATI_QUERY(IntegerOverflow, "Integer Overflow/Underflow to Sink", "Queries for tainted integer wrap-around arithmetic flowing into memory-sensitive sinks.")
 #endif
 
 #ifdef WASMATI_QUERY_AUX

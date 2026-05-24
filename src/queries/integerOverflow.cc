@@ -6,19 +6,19 @@ void VulnerabilityChecker::IntegerOverflow() {
     auto start = std::chrono::high_resolution_clock::now();
     std::set<std::string> ignore = config[IGNORE];
 
-    std::set<std::string> memorySinks = config.at(SINKS);
+    std::set<std::string> memorySinks{};
 
     if (config.contains(BUFFER_OVERFLOW) && config.at(BUFFER_OVERFLOW).is_object()) {
         for (auto const& kv : config.at(BUFFER_OVERFLOW).items()) {
             memorySinks.insert(kv.key());
         }
     }
-    if (config.contains(BO_MEMCPY) && config.at(BO_MEMCPY).is_object()) {
+    if (config.contains(BO_MEMCPY) && config.at(BO_MEMCPY).is_array()) {
         std::set<std::string> memcopyLike = config.at(BO_MEMCPY);
         memorySinks.insert(memcopyLike.begin(), memcopyLike.end());
           
     }
-    if (config.contains(MALLOC) && config.at(MALLOC).is_object()) {
+    if (config.contains(MALLOC) && config.at(MALLOC).is_array()) {
         std::set<std::string> mallocLike = config.at(MALLOC);
         memorySinks.insert(mallocLike.begin(), mallocLike.end());
     }
@@ -67,13 +67,13 @@ void VulnerabilityChecker::IntegerOverflow() {
             std::string taintParam {};
             std::string taintSourceFunction{};
             
-            auto locals = EdgeStream(arthOpt->inEdges(EdgeType::PDG))
+            auto arithmeticLocals = EdgeStream(arthOpt->inEdges(EdgeType::PDG))
                 .setUnion(arthOpt->outEdges(EdgeType::PDG))
                 .filterPDG(PDGType::Local)
                 .distincLabel()
                 .map<std::string>([](Edge* e){ return e->label(); });
             
-           for (const auto& local : locals) {
+           for (const auto& local : arithmeticLocals) {
                 auto param = NodeStream(func)
                                  .parameters(Predicate().name(local))
                                  .findFirst();
@@ -116,12 +116,28 @@ void VulnerabilityChecker::IntegerOverflow() {
             auto sinkPredicateTest = Predicate().TEST(
                 (node->instType() == InstType::Call &&
                  memorySinks.count(node->label()) == 1) ||
-                (explicitTaintRoot &&
-                 ((node->instType() == InstType::Store) ||
-                  (node->instType() == InstType::Load))));
+                node->instType() == InstType::Store ||
+                node->instType() == InstType::Load);
             
-            NodeStream(arthOpt).BFS(sinkPredicateTest, Query::PDG_EDGES)
+            NodeStream(arthOpt).BFS(sinkPredicateTest, Query::PDG_EDGES, 12)
                 .forEach([&](Node* potentialMemorySink) {
+                    auto sinkLocals = EdgeStream(potentialMemorySink->inEdges(EdgeType::PDG))
+                        .setUnion(potentialMemorySink->outEdges(EdgeType::PDG))
+                        .filterPDG(PDGType::Local)
+                        .distincLabel()
+                        .map<std::string>([](Edge* e){ return e->label(); });
+
+                    bool sharesLocalFlow{false};
+                    for (const auto& arithmeticLocal : arithmeticLocals) {
+                        if (std::find(sinkLocals.begin(), sinkLocals.end(), arithmeticLocal) != sinkLocals.end()) {
+                            sharesLocalFlow = true;
+                            break;
+                        }
+                    }
+                    if (!sharesLocalFlow) {
+                        return;
+                    }
+
                     const std::string sinkType = potentialMemorySink->instType() == InstType::Call ? potentialMemorySink->label() : INST_TYPE_MAP.at(potentialMemorySink->instType());
                     const std::string arthType = !arthOpt->label().empty() ? arthOpt->label() : std::string{arthOpt->opcode().GetName()};
                     const std::string key{func->name() + ":" + taintParam + ":" + arthType + ":" + sinkType};
@@ -129,8 +145,19 @@ void VulnerabilityChecker::IntegerOverflow() {
                         return;
                     }
                     seen.insert(key);
+                    std::string sinkContext{};
+                    if (potentialMemorySink->instType() == InstType::Load) {
+                        sinkContext = "index/pointer arithmetic reaches memory read (Load)";
+                    } else if (potentialMemorySink->instType() == InstType::Store) {
+                        sinkContext = "index/pointer arithmetic reaches memory write (Store)";
+                    } else {
+                        sinkContext = "arithmetic value reaches memory-sensitive call sink " + sinkType;
+                    }
                     std::stringstream description{};
-                    description << "Integer overflow in function " << taintSourceFunction << " with tainted parameter " << taintParam << " reachesarithmetic operation of type " << arthType << " and then memory-sensitive sink " << sinkType;
+                    description << "Integer overflow candidate in function " << taintSourceFunction
+                                << ": tainted parameter " << taintParam
+                                << " reaches arithmetic operation " << arthType
+                                << " and " << sinkContext;
                     vulns.emplace_back(VulnType::IntegerOverflow, func->name(), potentialMemorySink->label(), description.str());
                 });
             });
