@@ -1,6 +1,6 @@
 #include "src/query.h"
 #include "src/vulns.h"
-#include "src/sql-sink-find.h"
+#include "src/cmd-sink-find.h"
 using namespace wasmati;
 
 void VulnerabilityChecker::FormatStrings() {
@@ -38,7 +38,7 @@ void VulnerabilityChecker::FormatStrings() {
         NodeStream(func).instructions(callPredicate).forEach([&](Node* call) {
             // write vulns
             std::stringstream desc;
-            desc << SQLSinkFind(func,call);
+            desc << CmdSinkFind(func, call);
             vulns.emplace_back(VulnType::FormatStrings, func->name(),
                                call->label(), desc.str());
         });

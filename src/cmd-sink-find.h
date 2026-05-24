@@ -5,6 +5,6 @@
 #include "query.h"
 #include "vulns.h"
 
-std::string SQLSinkFind(wasmati::Node* func, wasmati::Node* call);
+std::string CmdSinkFind(wasmati::Node* func, wasmati::Node* call);
 
 #endif

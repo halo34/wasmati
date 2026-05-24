@@ -1,6 +1,6 @@
 #include "src/query.h"
 #include "src/vulns.h"
-#include "src/sql-sink-find.h"
+#include "src/cmd-sink-find.h"
 using namespace wasmati;
 
 void VulnerabilityChecker::BOMemcpy() {
@@ -79,7 +79,7 @@ void VulnerabilityChecker::BOMemcpy() {
                     desc << localVar->name() << " tainted from param"
                          << tainted.first << " in " << tainted.second;
 
-                    desc << SQLSinkFind(func,call);
+                    desc << CmdSinkFind(func,call);
                     vulns.emplace_back(VulnType::BufferOverflow, func->name(),
                                        call->label(), desc.str());
                                        
@@ -106,7 +106,7 @@ void VulnerabilityChecker::BOMemcpy() {
                     desc << param->name() << " tainted from param"
                          << tainted.first << " in " << tainted.second;
 
-                    desc << SQLSinkFind(func,call);
+                    desc << CmdSinkFind(func,call);
 
                     vulns.emplace_back(VulnType::BufferOverflow, func->name(),
                                        call->label(), desc.str());
@@ -135,7 +135,7 @@ void VulnerabilityChecker::BOMemcpy() {
                     desc << param->name() << " tainted from param"
                          << tainted.first << " in " << tainted.second;
 
-                    desc << SQLSinkFind(func,call);
+                    desc << CmdSinkFind(func,call);
 
                     
 

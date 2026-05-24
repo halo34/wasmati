@@ -24,7 +24,7 @@ Node* findConstNode(Node* node, int depth = 0) {
     return nullptr;
 }
 
-std::string SQLSinkFind(wasmati::Node* func, wasmati::Node* call) {
+std::string CmdSinkFind(wasmati::Node* func, wasmati::Node* call) {
     std::set<std::string> sinks = defaultConfig[SINKS];
     auto sinkCode =
         NodeStream(func)
@@ -50,11 +50,11 @@ std::string SQLSinkFind(wasmati::Node* func, wasmati::Node* call) {
  
         
 
-        return " sql sink exist " + sinkCode.get()->label() + " " + diff;
+        return " cmd exec sink exist " + sinkCode.get()->label() + " " + diff;
 
     }
     else {
-        return " no sql sink";
+        return " no cmd exec sink";
     }
 }
 
