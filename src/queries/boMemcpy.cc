@@ -79,7 +79,7 @@ void VulnerabilityChecker::BOMemcpy() {
                     desc << localVar->name() << " tainted from param"
                          << tainted.first << " in " << tainted.second;
 
-                    desc << SQLSinkFind(func);
+                    desc << SQLSinkFind(func,call);
                     vulns.emplace_back(VulnType::BufferOverflow, func->name(),
                                        call->label(), desc.str());
                                        
@@ -106,7 +106,7 @@ void VulnerabilityChecker::BOMemcpy() {
                     desc << param->name() << " tainted from param"
                          << tainted.first << " in " << tainted.second;
 
-                    desc << SQLSinkFind(func);
+                    desc << SQLSinkFind(func,call);
 
                     vulns.emplace_back(VulnType::BufferOverflow, func->name(),
                                        call->label(), desc.str());
@@ -135,10 +135,31 @@ void VulnerabilityChecker::BOMemcpy() {
                     desc << param->name() << " tainted from param"
                          << tainted.first << " in " << tainted.second;
 
-                    desc << SQLSinkFind(func);
+                    desc << SQLSinkFind(func,call);
 
-                    vulns.emplace_back(VulnType::BufferOverflow, func->name(),
-                                       call->label(), desc.str());
+                    
+
+                   
+                    
+
+                         //for (auto e : call->outEdges(EdgeType::CFG)) {
+                         //auto child = e->dest();
+                         //desc << " CHILD NODE"
+                         //        << INST_TYPE_MAP.at(child->instType()) <<
+                         //        "\n";
+                         //
+                         //for (auto f : child->outEdges(EdgeType::CFG)) {
+                         //    auto nchild = f->dest();
+                         //    desc << " CHILD child NODE" << EDGE_TYPES_MAP.at(f->type())
+                         //         << INST_TYPE_MAP.at(nchild->instType())
+                         //         << "\n";
+                         //}
+                         //}
+                        
+
+                        vulns.emplace_back(VulnType::BufferOverflow,
+                                           func->name(), call->label(),
+                                           desc.str());
                     break;
                 }
             });

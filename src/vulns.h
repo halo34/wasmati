@@ -72,7 +72,7 @@ static const json defaultConfig = R"(
 	],
 	"sources": [ "$read_bytes_to_mmap_memory" ],
 	"sinks": [    "$sqlite3_prepare_v2",
-    "$sqlite3_exec"],
+    "$sqlite3_exec", "$emscripten_run_script"],
 	"tainted": {
 		"$main": { "params": [ 0, 1 ] },
 		"$store_data": { "params": [ 0 ] },

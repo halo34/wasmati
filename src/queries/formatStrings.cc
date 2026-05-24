@@ -38,7 +38,7 @@ void VulnerabilityChecker::FormatStrings() {
         NodeStream(func).instructions(callPredicate).forEach([&](Node* call) {
             // write vulns
             std::stringstream desc;
-            desc << SQLSinkFind(func);
+            desc << SQLSinkFind(func,call);
             vulns.emplace_back(VulnType::FormatStrings, func->name(),
                                call->label(), desc.str());
         });
