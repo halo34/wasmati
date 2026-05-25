@@ -2,7 +2,7 @@
 #include "src/vulns.h"
 using namespace wasmati;
 
-void VulnerabilityChecker::IntegerOverflow() {
+void VulnerabilityChecker::IntegerOverflowUnderflow() {
     auto start = std::chrono::high_resolution_clock::now();
     std::set<std::string> ignore = config[IGNORE];
 
@@ -158,7 +158,7 @@ void VulnerabilityChecker::IntegerOverflow() {
                                 << ": tainted parameter " << taintParam
                                 << " reaches arithmetic operation " << arthType
                                 << " and " << sinkContext;
-                    vulns.emplace_back(VulnType::IntegerOverflow, func->name(), potentialMemorySink->label(), description.str());
+                    vulns.emplace_back(VulnType::IntegerOverflowUnderflow, func->name(), potentialMemorySink->label(), description.str());
                 });
             });
         

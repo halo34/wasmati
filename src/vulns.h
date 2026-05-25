@@ -126,7 +126,7 @@ enum class VulnType {
     Tainted,
     UaF,
     DoubleFree,
-    IntegerOverflow
+    IntegerOverflowUnderflow
 };
 
 NLOHMANN_JSON_SERIALIZE_ENUM(VulnType,
@@ -138,7 +138,7 @@ NLOHMANN_JSON_SERIALIZE_ENUM(VulnType,
                                  {VulnType::Tainted, "Tainted Variable"},
                                  {VulnType::UaF, "Use After Free"},
                                  {VulnType::DoubleFree, "Double Free"},
-                                 {VulnType::IntegerOverflow,
+                                 {VulnType::IntegerOverflowUnderflow,
                                   "Integer Overflow"},
                              });
 

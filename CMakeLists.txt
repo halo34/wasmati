@@ -296,7 +296,7 @@ add_library(wasmatilib STATIC
 	  src/queries/unreachable.cc
 	  src/queries/useAfterFree.cc
 	  src/queries/doubleFree.cc
-    src/queries/integerOverflow.cc
+    src/queries/integerOverflowUnderflow.cc
 	  # interpreter
 	  src/interpreter/scanner.h
 	  src/interpreter/interpreter.h 
