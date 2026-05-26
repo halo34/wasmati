@@ -1,4 +1,3 @@
-# wasmati/tests/c/makefile
 EMCC=emcc
 WASM_FILES=$(patsubst %.c,%.wasm,$(wildcard *.c))
 

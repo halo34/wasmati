@@ -297,6 +297,8 @@ add_library(wasmatilib STATIC
 	  src/queries/useAfterFree.cc
 	  src/queries/doubleFree.cc
     src/queries/integerOverflowUnderflow.cc
+    #src/queries/typeTruncation.cc
+    src/queries/fileWriteSink.cc
 	  # interpreter
 	  src/interpreter/scanner.h
 	  src/interpreter/interpreter.h 

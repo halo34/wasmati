@@ -27,6 +27,7 @@
 #define CONTROL_FLOW "controlFlow"
 #define SOURCE "source"
 #define DEST "dest"
+#define FILE_WRITE "fileWrite"
 
 namespace wasmati {
 
@@ -104,7 +105,7 @@ static const json defaultConfig = R"(
 		"$syslog": 1,
 		"$vsyslog": 1
 	},
-	"malloc": [ "$malloc", "$dlmalloc" ],
+	"malloc": [ "$malloc", "$dlmalloc", "$emscripten_builtin_malloc" ],
 	"controlFlow": [
 		{
 			"source": "$malloc",
@@ -113,8 +114,17 @@ static const json defaultConfig = R"(
 		{
 			"source": "$dlmalloc",
 			"dest": "$dlfree"
-		}
-	]
+		},
+        {
+            "source": "$emscripten_builtin_malloc",
+            "dest": "$emscripten_builtin_free"
+        }
+	],
+    "fileWrite": {
+  "$wasi_snapshot_preview1.fd_write": { "bufferParam": 1 },
+  "$fwrite": { "bufferParam": 0 },
+  "$write": { "bufferParam": 1 }
+}
 }
 )"_json;
 
@@ -126,7 +136,8 @@ enum class VulnType {
     Tainted,
     UaF,
     DoubleFree,
-    IntegerOverflowUnderflow
+    IntegerOverflowUnderflow,
+    FileWriteSink
 };
 
 NLOHMANN_JSON_SERIALIZE_ENUM(VulnType,
@@ -140,6 +151,9 @@ NLOHMANN_JSON_SERIALIZE_ENUM(VulnType,
                                  {VulnType::DoubleFree, "Double Free"},
                                  {VulnType::IntegerOverflowUnderflow,
                                   "Integer Overflow"},
+                                //  {VulnType::TypeTruncation,
+                                //   "Type Truncation"}, 
+                                {VulnType::FileWriteSink, "File Write Sink"},
                              });
 
 struct Vulnerability {
