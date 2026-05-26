@@ -1,4 +1,4 @@
-FROM openjdk:11-jdk-slim
+FROM eclipse-temurin:11-jdk-jammy
 
 ENV NEO4J_SHA256=0f074e2d84c265fbb066ad648b52c62c623d1f1b18b9d4d04356d46726853c96 \
     NEO4J_TARBALL=neo4j-community-4.2.1-unix.tar.gz \

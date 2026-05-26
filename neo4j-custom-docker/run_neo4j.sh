@@ -9,9 +9,6 @@ fi
 # Make sure this is not in history because of password in .config
 unset HISTFILE
 
-# Load config file
-. .config
-
 GRAPH_DIR_PATH=$(realpath $1)
 GRAPH_DIR_BASE=$(basename "$GRAPH_DIR_PATH")
 PARENT_DIR=$(dirname "$GRAPH_DIR_PATH")
@@ -32,10 +29,6 @@ echo "[INFO] - Will import queries in $NEO4J_QUERIES"
 NEO4J_WASMATI_CONTAINER=neo4j-wasmati
 
 RESULTS_DIR=execution-results
-
-# Make sure we have permissions to use graph files (auto chowned by docker...)
-echo $password | sudo -S chown $UID:$UID -R $GRAPH_DIR_PATH
-echo $password | sudo -S chown $UID:$UID -R $NEO4J_QUERIES
 
 if [ "$DEBUG" = true ]; then
     # Build and Run container
@@ -65,14 +58,20 @@ else
         -p 7474:7474 -p 7687:7687 neo4j-docker
 
     echo "[INFO] - Waiting for server to start..."
-    # Check if server already accepting connections
-    #docker logs $NEO4J_WASMATI_CONTAINER &) | grep -q "Started."
-    if uname -a | grep -q "WSL2"; then
-        while ! (docker logs $NEO4J_WASMATI_CONTAINER| grep -q 'Started'); do
-            sleep 1
-        done
-    else
-        (echo $password | sudo -S tail -f -n0 `docker inspect --format='{{.LogPath}}' $NEO4J_WASMATI_CONTAINER` &) | grep -q "Started."
+    START_TIMEOUT=180
+    STARTED=false
+    for ((i=0; i<START_TIMEOUT; i++)); do
+        if docker logs $NEO4J_WASMATI_CONTAINER 2>&1 | grep -q 'Started.'; then
+            STARTED=true
+            break
+        fi
+        sleep 1
+    done
+    if [ "$STARTED" != true ]; then
+        echo "[ERROR] - Neo4j did not start within ${START_TIMEOUT}s. Recent logs:"
+        docker logs --tail 100 $NEO4J_WASMATI_CONTAINER
+        docker stop $NEO4J_WASMATI_CONTAINER >/dev/null 2>&1 || true
+        exit 1
     fi
     echo "[INFO] - Neo4j server started..."
 
@@ -84,10 +83,6 @@ else
     echo "[INFO] - Stopping and removing container $NEO4j_WASMATI_CONTAINER"
     docker stop $NEO4J_WASMATI_CONTAINER
 fi
-
-# Make sure we have permissions to use graph files (auto chowned by docker...)
-echo $password | sudo -S chown $UID:$UID -R $GRAPH_DIR_PATH
-echo $password | sudo -S chown $UID:$UID -R $NEO4J_QUERIES
 
 if [ "$DEBUG" = false ]; then
 # Move results and times to execution results directory
