@@ -135,33 +135,36 @@ void VulnerabilityChecker::BOMemcpy() {
                     desc << param->name() << " tainted from param"
                          << tainted.first << " in " << tainted.second;
 
-                    desc << CmdSinkFind(func,call);
-
-                    
+                    auto call_child = call->getChild(0);
+                    desc << " call_child " << INST_TYPE_MAP.at(call_child->instType());
 
                    
-                    
 
-                         //for (auto e : call->outEdges(EdgeType::CFG)) {
-                         //auto child = e->dest();
-                         //desc << " CHILD NODE"
-                         //        << INST_TYPE_MAP.at(child->instType()) <<
-                         //        "\n";
-                         //
-                         //for (auto f : child->outEdges(EdgeType::CFG)) {
-                         //    auto nchild = f->dest();
-                         //    desc << " CHILD child NODE" << EDGE_TYPES_MAP.at(f->type())
-                         //         << INST_TYPE_MAP.at(nchild->instType())
-                         //         << "\n";
-                         //}
-                         //}
-                        
+                    // for (auto e :
+                    // call->getChild(0)->outEdges(EdgeType::AST)) {
+                    //     auto child = e->dest();
+                    //     desc << " CHILD NODE "
+                    //          << INST_TYPE_MAP.at(child->instType()) <<
+                    //          "
+                    //          "<< child->label() <<"\n";
+                    //     if(child->instType()==InstType::Const){
+                    //         desc << "const " << child->value().u32;
+                    //     }
+                    //
+                    //     if(child->instType()==InstType::LocalGet){
+                    //         desc << "local get" << child->value().u32;
+                    //     }
+                    //
+                    //
+                    //
+                    // }
 
-                        vulns.emplace_back(VulnType::BufferOverflow,
-                                           func->name(), call->label(),
-                                           desc.str());
+                    desc << CmdSinkFind(func, call->getChild(0));
+
+                    vulns.emplace_back(VulnType::BufferOverflow, func->name(),
+                                       call->label(), desc.str());
                     break;
-                }
+                    }
             });
     }
     auto end = std::chrono::high_resolution_clock::now();

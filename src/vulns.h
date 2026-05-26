@@ -15,6 +15,7 @@
 #define WHITELIST "whiteList"
 #define SOURCES "sources"
 #define SINKS "sinks"
+#define CMD_SINKS "cmdSinks"
 #define TAINTED "tainted"
 #define PARAMS "params"
 #define BUFFER_OVERFLOW "bufferOverflow"
@@ -72,8 +73,13 @@ static const json defaultConfig = R"(
 		"$fflush"
 	],
 	"sources": [ "$read_bytes_to_mmap_memory" ],
-	"sinks": [    "$sqlite3_prepare_v2",
-    "$sqlite3_exec", "$emscripten_run_script"],
+	"sinks": [    ],
+    
+    "cmdSinks": {
+                "$sqlite3_prepare_v2": 1,
+                "$emscripten_run_script": 0
+                },
+                
 	"tainted": {
 		"$main": { "params": [ 0, 1 ] },
 		"$store_data": { "params": [ 0 ] },
