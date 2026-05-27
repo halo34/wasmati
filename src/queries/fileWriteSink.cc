@@ -11,40 +11,39 @@ void VulnerabilityChecker::FileWriteSink() {
         return;
     }
 
-    json fwConfig = config.at(FILE_WRITE);
+    auto fwConfig = config[FILE_WRITE];
     std::set<std::string> ignore = config[IGNORE];
-
-    std::set<std::string> fwSinks;
-    for (auto const& kv : fwConfig.items()) {
-        fwSinks.insert(kv.key());
-    }
+ 
+    //std::set<std::string> fwSinks;
+    //for (auto const& kv : fwConfig.items()) {
+    //    fwSinks.insert(kv.key());
+    //}
 
     Index counter = 0;
     for (auto func : Query::functions()) {
-        debug("[DEBUG][Query::FileWriteSink][%u/%u] Function %s\n", counter++,
-              numFuncs, func->name().c_str());
+        debug("[DEBUG][Query::FileWriteSink][%u/%u] Function %s\n",
+               counter++, numFuncs, func->name().c_str());
 
         if (ignore.count(func->name()) == 1) {
             continue;
         }
 
-        if (fwSinks.count(func->name()) == 1) {
-            // wenn Funktion selbst Sink ist, in dieser Query skippen
-            continue;
-        }
+        //if (fwSinks.count(func->name()) == 1) {
+        //    // wenn Funktion selbst Sink ist, in dieser Query skippen
+        //    continue;
+        //}
 
         NodeStream(func)
             .instructions(Predicate()
                               .instType(InstType::Call)
-                              .TEST(fwSinks.count(node->label()) == 1))
+    .TEST(fwConfig.count(node->label())==1))
             .forEach([&](Node* call) {
-                if (!fwConfig.at(call->label()).contains("bufferParam")) {
-                    return;
-                }
+                
 
-                Index bufferParam = fwConfig.at(call->label()).at("bufferParam");
+                Index bufferParam = fwConfig[call->label()];
                 Node* arg = call->getChild(bufferParam);
-
+                
+                // TODO ACTUALLY GET THE VULN??
                 auto localVarDeps =
                     EdgeStream(arg->outEdges(EdgeType::PDG))
                         .setUnion(arg->inEdges(EdgeType::PDG))

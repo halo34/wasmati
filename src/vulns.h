@@ -30,6 +30,8 @@
 #define DEST "dest"
 #define FILE_WRITE "fileWrite"
 
+#define BUFFER_PARAM "bufferParam" 
+
 namespace wasmati {
 
 static const json defaultConfig = R"(
@@ -127,9 +129,9 @@ static const json defaultConfig = R"(
         }
 	],
     "fileWrite": {
-  "$wasi_snapshot_preview1.fd_write": { "bufferParam": 1 },
-  "$fwrite": { "bufferParam": 0 },
-  "$write": { "bufferParam": 1 }
+  "$wasi_snapshot_preview1.fd_write": 1 ,
+  "$fwrite":  0 ,
+  "$write": 1 
 }
 }
 )"_json;
