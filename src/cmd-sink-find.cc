@@ -52,8 +52,13 @@ std::string CmdSinkFind(wasmati::Node* func, wasmati::Node* call) {
                     .instType(InstType::Call)
                     .TEST(defaultConfig[CMD_SINKS].contains(node->label())))
             .findFirst();
-
+    std::string sinkType = "cmd";
     if (sinkCode.isPresent()) {
+        const std::string sinkLabel = sinkCode.get()->label();
+        if (sinkLabel.find("sqlite") != std::string::npos ||
+            sinkLabel.find("sql") != std::string::npos) {
+            sinkType = "sql";
+        }
         Index index = defaultConfig[CMD_SINKS][sinkCode.get()->label()];
 
         Node* sinkConstNode = findConstNode(sinkCode.get()->getChild(index));
@@ -69,14 +74,10 @@ std::string CmdSinkFind(wasmati::Node* func, wasmati::Node* call) {
                                 callConstNode->value().u32) +
                 "<cmd>";
         }
-
-        
-
-        return " cmd exec sink exist " + sinkCode.get()->label() + " " + diff;
+        return " " + sinkType + " exec sink exist " + sinkCode.get()->label() + " " + diff;
 
     }
     else {
-        return " no cmd exec sink";
+        return " no " + sinkType + " exec sink";
     }
 }
-
